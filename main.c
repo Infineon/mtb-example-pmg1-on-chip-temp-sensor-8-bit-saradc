@@ -7,7 +7,7 @@
 * Related Document: See README.md
 *
 *******************************************************************************
-* Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2022-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -46,6 +46,7 @@
 #include "cybsp.h"
 #include "cy_pdl.h"
 #include "stdio.h"
+#include <inttypes.h>
 
 /*******************************************************************************
 * Macros
@@ -54,6 +55,14 @@
 #define SW_DEBOUNCE_DELAY         (25u)
 #define TEMP_SLOPE                (-742) /* This value can be adjusted to calibrate the slope of the temperature correlation graph*/
 #define TEMP_OFFSET               (493)  /* This value can be adjusted to calibrate the offset of the temperature correlation graph*/
+
+/* Debug print macro to enable UART print */
+#define DEBUG_PRINT               (0u)
+
+/*******************************************************************************
+* Global Variable
+*******************************************************************************/
+cy_stc_scb_uart_context_t UART_context;
 
 /* User Switch Interrupt Configuration */
 const cy_stc_sysint_t User_Switch_intr_config =
@@ -72,6 +81,39 @@ cy_stc_pd_dpm_config_t* get_dpm_connect_stat()
 {
     return NULL;    /* This value is not required here, hence NULL is returned */
 }
+
+#if DEBUG_PRINT
+/* Variable used for tracking the print status */
+volatile bool ENTER_LOOP = true;
+
+/*******************************************************************************
+* Function Name: check_status
+********************************************************************************
+* Summary:
+*  Prints the error message.
+*
+* Parameters:
+*  error_msg - message to print if any error encountered.
+*  status - status obtained after evaluation.
+*
+* Return:
+*  void
+*
+*******************************************************************************/
+void check_status(char *message, cy_rslt_t status)
+{
+    char error_msg[50];
+
+    sprintf(error_msg, "Error Code: 0x%08" PRIX32 "\n", status);
+
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\r\n=====================================================\r\n");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\nFAIL: ");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, message);
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\r\n");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, error_msg);
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\r\n=====================================================\r\n");
+}
+#endif
 
 /*******************************************************************************
 * Function Name: main
@@ -93,8 +135,17 @@ cy_stc_pd_dpm_config_t* get_dpm_connect_stat()
 int main(void)
 {
     cy_rslt_t result;
-    cy_stc_scb_uart_context_t UART_context;    /* UART context */
     cy_stc_usbpd_context_t USBPD;              /* USBPD context */
+    cy_en_usbpd_status_t usbpd_result;
+    cy_en_sysint_status_t intr_result;
+
+    /* Variables to store ADC outputs */
+    uint8_t BJT_val;
+    uint8_t BANDGAP;
+
+    /* Variables to store temperature data */
+    int8_t temp;
+    char_t TEMP[30];
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
@@ -109,27 +160,48 @@ int main(void)
      * Required for uninterrupted USBPD Stack initialization */
     memset((void *)&USBPD, 0, sizeof (cy_stc_usbpd_context_t));
 
-    /* Initialize the USBPD Stack */
-   #if defined(CY_DEVICE_CCG3)
-    Cy_USBPD_Init(&USBPD, 0, mtb_usbpd_port0_HW, NULL,
-                 (cy_stc_usbpd_config_t *)&mtb_usbpd_port0_config, get_dpm_connect_stat);
-   #else
-    Cy_USBPD_Init(&USBPD, 0, mtb_usbpd_port0_HW, mtb_usbpd_port0_HW_TRIM,
-                 (cy_stc_usbpd_config_t *)&mtb_usbpd_port0_config, get_dpm_connect_stat);
-   #if PMG1_PD_DUALPORT_ENABLE
-    Cy_USBPD_Init(&USBPD, 1, mtb_usbpd_port1_HW, mtb_usbpd_port1_HW_TRIM,
-                 (cy_stc_usbpd_config_t *)&mtb_usbpd_port1_config, get_dpm_port1_connect_stat);
-   #endif /* PMG1_PD_DUALPORT_ENABLE */
-   #endif
-
     /* Configure and enable the UART peripheral */
     Cy_SCB_UART_Init(CYBSP_UART_HW, &CYBSP_UART_config, &UART_context);
     Cy_SCB_UART_Enable(CYBSP_UART_HW);
 
-    /* Initialize Switch GPIO interrupt */
-    result = Cy_SysInt_Init(&User_Switch_intr_config, &User_Switch_Interrupt_Handler);
-    if(result != CY_SYSINT_SUCCESS)
+#if DEBUG_PRINT
+    /* Sequence to clear screen */
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\x1b[2J\x1b[;H");
+
+    /* Print "On-chip temp sensor 8-bit SAR ADC" */
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "****************** ");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "PMG1 MCU: On-chip temp sensor 8-bit SAR ADC");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "****************** \r\n\n");
+#endif
+
+    /* Initialize the USBPD Stack */
+   #if defined(CY_DEVICE_CCG3)
+    usbpd_result = Cy_USBPD_Init(&USBPD, 0, mtb_usbpd_port0_HW, NULL,
+                 (cy_stc_usbpd_config_t *)&mtb_usbpd_port0_config, get_dpm_connect_stat);
+   #else
+    usbpd_result = Cy_USBPD_Init(&USBPD, 0, mtb_usbpd_port0_HW, mtb_usbpd_port0_HW_TRIM,
+                 (cy_stc_usbpd_config_t *)&mtb_usbpd_port0_config, get_dpm_connect_stat);
+   #if PMG1_PD_DUALPORT_ENABLE
+    usbpd_result = Cy_USBPD_Init(&USBPD, 1, mtb_usbpd_port1_HW, mtb_usbpd_port1_HW_TRIM,
+                 (cy_stc_usbpd_config_t *)&mtb_usbpd_port1_config, get_dpm_port1_connect_stat);
+   #endif /* PMG1_PD_DUALPORT_ENABLE */
+   #endif
+
+    if (usbpd_result != CY_USBPD_STAT_SUCCESS)
     {
+#if DEBUG_PRINT
+        check_status("API Cy_USBPD_Init failed with error code", usbpd_result);
+#endif
+        CY_ASSERT(CY_ASSERT_FAILED);
+    }
+
+    /* Initialize Switch GPIO interrupt */
+    intr_result = Cy_SysInt_Init(&User_Switch_intr_config, &User_Switch_Interrupt_Handler);
+    if(intr_result != CY_SYSINT_SUCCESS)
+    {
+#if DEBUG_PRINT
+        check_status("API Cy_SysInt_Init failed with error code", intr_result);
+#endif
         CY_ASSERT(CY_ASSERT_FAILED);
     }
 
@@ -140,16 +212,8 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-    /* Variables to store ADC outputs */
-    uint8_t BJT_val;
-    uint8_t BANDGAP;
-
-    /* Variables to store temperature data */
-    int8_t temp;
-    char_t TEMP[30];
-
     /* Send a string over serial terminal */
-    Cy_SCB_UART_PutString(CYBSP_UART_HW,"\n\nPress user switch (SW2) to display the Die-Temperature\r\n");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW,"\n Press user switch (SW2) to display the Die-Temperature\r\n");
 
     for(;;)
     {
@@ -158,6 +222,7 @@ int main(void)
             /* Wait for 25 milliseconds for switch de-bounce*/
             Cy_SysLib_Delay(SW_DEBOUNCE_DELAY);
 
+            /* Capturing the PIN state for press and release detection */
             if(!Cy_GPIO_Read(CYBSP_USER_SW_PORT, CYBSP_USER_SW_PIN))
             {
                 BJT_val = Cy_USBPD_Adc_Sample(&USBPD, CY_USBPD_ADC_ID_0, CY_USBPD_ADC_INPUT_BJT);
@@ -178,6 +243,14 @@ int main(void)
             /* Clear the Switch Press Event */
             SwitchPressFlag = 0;
         }
+
+#if DEBUG_PRINT
+        if (ENTER_LOOP)
+        {
+            Cy_SCB_UART_PutString(CYBSP_UART_HW, "Entered for loop\r\n");
+            ENTER_LOOP = false;
+        }
+#endif
     }
 
 } 
