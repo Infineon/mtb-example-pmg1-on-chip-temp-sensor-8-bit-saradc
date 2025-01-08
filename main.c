@@ -82,6 +82,17 @@ cy_stc_pd_dpm_config_t* get_dpm_connect_stat()
     return NULL;    /* This value is not required here, hence NULL is returned */
 }
 
+/* Initialize  port 1 for dual port designs or using EVAL_PMG1-S3_DUALDRP kit, else disable */
+
+#if PMG1_PD_DUALPORT_ENABLE
+
+cy_stc_pd_dpm_config_t* get_dpm_port1_connect_stat()
+{
+    return NULL;    /* This value is not required here, hence NULL is returned */
+}
+
+#endif
+
 #if DEBUG_PRINT
 /* Variable used for tracking the print status */
 volatile bool ENTER_LOOP = true;

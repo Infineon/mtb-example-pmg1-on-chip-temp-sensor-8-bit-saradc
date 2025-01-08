@@ -1,11 +1,11 @@
 # EZ-PD&trade; PMG1 MCU: On-chip temp sensor 8-bit SAR ADC
 
-This code example demonstrates the method of reading internal temperature of EZ-PD&trade; PMG1 MCU devices through a BJT-based on-chip temperature sensor provided on PMG1 devices using an 8-bit SAR ADC in the USBPD block and displays the temperature value on a UART terminal.
+This code example demonstrates the method of reading internal temperature of EZ-PD&trade; PMG1 MCU devices through a BJT-based on-chip temperature sensor provided with PMG1 devices using an 8-bit SAR ADC in the USBPD block and displays the temperature value on a UART terminal.
 
 
 [View this README on GitHub.](https://github.com/Infineon/mtb-example-pmg1-on-chip-temp-sensor-8-bit-saradc)
 
-[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzQ1NjMiLCJTcGVjIE51bWJlciI6IjAwMi0zNDU2MyIsIkRvYyBUaXRsZSI6IkVaLVBEJnRyYWRlOyBQTUcxIE1DVTogT24tY2hpcCB0ZW1wIHNlbnNvciA4LWJpdCBTQVIgQURDIiwicmlkIjoiZWFzb3ZhcmdoZXNlIiwiRG9jIHZlcnNpb24iOiIyLjEuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJXSVJFRCIsIkRvYyBGYW1pbHkiOiJUWVBFLUMifQ==)
+[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzQ1NjMiLCJTcGVjIE51bWJlciI6IjAwMi0zNDU2MyIsIkRvYyBUaXRsZSI6IkVaLVBEJnRyYWRlOyBQTUcxIE1DVTogT24tY2hpcCB0ZW1wIHNlbnNvciA4LWJpdCBTQVIgQURDIiwicmlkIjoiZWFzb3ZhcmdoZXNlIiwiRG9jIHZlcnNpb24iOiIyLjIuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJXSVJFRCIsIkRvYyBGYW1pbHkiOiJUWVBFLUMifQ==)
 
 
 ## Requirements
@@ -15,11 +15,15 @@ This code example demonstrates the method of reading internal temperature of EZ-
 - Programming language: C
 - Associated parts: All [EZ-PD&trade; PMG1 MCU](https://www.infineon.com/PMG1) parts
 
+
+
 ## Supported toolchains (make variable 'TOOLCHAIN')
 
 - GNU Arm&reg; Embedded Compiler v10.3.1 (`GCC_ARM`) – Default value of `TOOLCHAIN`
 - Arm&reg; Compiler v6.13 (`ARM`)
 - IAR C/C++ Compiler v8.42.2 (`IAR`)
+
+
 
 
 ## Supported kits (make variable 'TARGET')
@@ -28,6 +32,8 @@ This code example demonstrates the method of reading internal temperature of EZ-
 - [EZ-PD&trade; PMG1-S2 Prototyping Kit](https://www.infineon.com/CY7112) (`PMG1-CY7112`)
 - [EZ-PD&trade; PMG1-S3 Prototyping Kit](https://www.infineon.com/CY7113) (`PMG1-CY7113`)
 - [EZ-PD&trade; PMG1-B1 Prototyping Kit](https://www.infineon.com/EVAL_PMG1_B1_DRP) (`EVAL_PMG1_B1_DRP`)
+- [EZ-PD&trade; PMG1-S1 DRP Prototyping Kit](https://www.infineon.com/EVAL_PMG1_S1_DRP) (`EVAL_PMG1_S1_DRP`)
+- [EZ-PD&trade; PMG1-S3 DRP Prototyping Kit](https://www.infineon.com/EVAL_PMG1_S3_DUALDRP) (`EVAL_PMG1_S3_DUALDRP`)
 
 
 ## Hardware setup
@@ -36,7 +42,7 @@ This code example demonstrates the method of reading internal temperature of EZ-
 
 2. Connect the USB PD port (J10) to a USB-C power adapter/USB port on PC using a Type-C/Type-A to Type-C cable to power the PMG1 device for normal operation.
 
-3. Connect the UART Tx and UART Rx lines from the PMG1 kit to the KitProg3 as shown below to establish a UART connection between KitProg3 and the PMG1 device for the following revisions of the PMG1 prototyping kits. <mark>:Text missing? or delete Note that 
+3. Connect the UART Tx and UART Rx lines from the PMG1 kit to the KitProg3 (as shown in Table 1) to establish a UART connection between KitProg3 and the PMG1 device for the following revisions of the PMG1 prototyping kits. 
 
 > **Note:** In this application, only the UART Tx line is used to transmit the temperature data onto the serial monitor.
 
@@ -49,6 +55,8 @@ This code example demonstrates the method of reading internal temperature of EZ-
    PMG1-CY7112 (revision 2 or lower) | J6.10 to J3.8 | J6.9 to J3.10
    PMG1-CY7113 (revision 3 or lower) | J6.10 to J3.8 | J6.9 to J3.10
    EVAL_PMG1_B1_DRP | SW5 to 1-2 position | SW4 to 1-2 position
+   EVAL_PMG1_S3_DUALDRP | N/A  | N/A
+   EVAL_PMG1_S1_DRP | N/A  | N/A
    
    <br>
 
@@ -62,6 +70,9 @@ This code example demonstrates the method of reading internal temperature of EZ-
 See the [ModusToolbox&trade; tools package installation guide](https://www.infineon.com/ModusToolboxInstallguide) for information about installing and configuring the tools package.
 
 Install a terminal emulator if you don't have one. Instructions in this document use [Tera Term](https://teratermproject.github.io/index-en.html).
+
+This example requires no additional software or tools.
+
 
 
 ## Using the code example
@@ -107,8 +118,8 @@ The following example clones the "[mtb-example-pmg1-on-chip-temp-sensor-8-bit-sa
    ```
    project-creator-cli --board-id PMG1-CY7110 --app-id mtb-example-pmg1-on-chip-temp-sensor-8-bit-saradc --user-app-name MyOn-chiptempsensor8-bitSARADC --target-dir "C:/mtb_projects"
    ```
-   
-   The 'project-creator-cli' tool has the following arguments:
+
+The 'project-creator-cli' tool has the following arguments:
 
 Argument | Description | Required/optional
 ---------|-------------|-----------
@@ -116,8 +127,6 @@ Argument | Description | Required/optional
 `--app-id`   | Defined in the <id> field of the [CE](https://github.com/Infineon?q=ce-manifest&type=&language=&sort=) manifest | Required
 `--target-dir`| Specify the directory in which the application is to be created if you prefer not to use the default current working directory | Optional
 `--user-app-name`| Specify the name of the application if you prefer to have a name other than the example's default name | Optional
-
-<br>
 
 > **Note:** The project-creator-cli tool uses the `git clone` and `make getlibs` commands to fetch the repository and import the required libraries. For details, see the "Project creator tools" section of the [ModusToolbox&trade; tools package user guide](https://www.infineon.com/ModusToolboxUserGuide) (locally available at {ModusToolbox&trade; install directory}/docs_{version}/mtb_user_guide.pdf).
 
@@ -177,9 +186,9 @@ For more details, see the [ModusToolbox&trade; tools package user guide](https:/
 
 ## Operation
 
-1. Ensure that the steps listed in the [Hardware setup](#hardware-setup) section are completed.
+1. Complete the steps listed in the [Hardware setup](#hardware-setup) section.
 
-2. Ensure that the jumper shunt on the power selection jumper (J5) is placed at position 2-3 to enable programming mode for PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, and PMG1-CY7113 prototyping kits. Skip this step for EVAL_PMG1_B1_DRP kit.
+2. Ensure that the jumper shunt on the power selection jumper (J5) is placed at position 2-3 to enable programming mode for PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, PMG1-CY7113 EVAL_PMG1_S1_DRP, and EVAL_PMG1_S3_DUALDRP prototyping kits. Skip this step for EVAL_PMG1_B1_DRP kit.
 
 3. Connect the board to your PC using the USB cable through the KitProg3 USB connector (J1). This cable is used for programming the PMG1 device.
 
@@ -199,7 +208,7 @@ For more details, see the [ModusToolbox&trade; tools package user guide](https:/
    </details>
 
 
-   	<details><summary><b>Using CLI</b></summary>
+   <details><summary><b>Using CLI</b></summary>
 
      From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. The default toolchain is specified in the application's Makefile but you can override this value manually:
       ```
@@ -212,28 +221,28 @@ For more details, see the [ModusToolbox&trade; tools package user guide](https:/
       ```
    </details>
 
-5. After programming the kit, disconnect the USB cable. Move to the next step for EVAL_PMG1_B1_DRP kit. Change the position on the power selection jumper (J5) to 1-2, to power the kit through the USB PD port in operational mode for PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, and PMG1-CY7113 prototyping kits.
+5. After programming the kit, disconnect the USB cable. Move to the next step for EVAL_PMG1_B1_DRP kit. Change the position on the power selection jumper (J5) to 1-2 to power the kit through the USB PD port in operational mode for PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, and PMG1-CY7113 EVAL_PMG1_S1_DRP prototyping kits. For EVAL_PMG1_S3_DUALDRP prototyping kit, change the position on the power selection jumper (J5) to 1-2 to power the kit through the USB PD ports (J10 and J14).
 
 6. Reconnect the USB cable to KitProg3 Type-C port (J1). Open a terminal program and select the KitProg3 COM port. Set the serial port parameters to 8N1 and 115200 baud.
 
-7. Power the kit through the USB PD port (J10) using the second USB cable to power the PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, and PMG1-CY7113 prototyping kits. Skip this step for the EVAL_PMG1_B1_DRP kit as it is automatically powered when the kit is connected through the KitProg3 USB Type-C port (J1).
+7. Power the kit through the USB PD port (J10) using the second USB cable to power the PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, and PMG1-CY7113, and EVAL_PMG1_S1_DRP prototyping kits. For EVAL_PMG1_S3_DUALDRP, power the kit through the USB PD ports (J10 or J14). Skip this step for the EVAL_PMG1_B1_DRP as the kit is automatically powered when the it is connected through the KitProg3 USB Type-C port (J1).
 
-8. As soon as the kit is powered through the USB PD port, the application starts printing "Press user switch (SW2) to display the Die-Temperature". Press the user switch (SW2) to display the value of the die temperature. Note that the user LED (LED3) toggles each time, indicating the temperature display on the UART terminal.
+8. As soon as the kit is powered through the USB PD port, the application starts printing **Press user switch (SW2) to display the Die-Temperature**. Press the user switch (SW2) to display the value of the die temperature. Note that the user LED (LED3) toggles each time, indicating the temperature display on the UART terminal.
 
-**Figure 1. Terminal data display**
+   **Figure 1. Terminal data display**
 
 <img src = "images/terminal-data-display.png" width = "600"/>
 
 
 ## Debugging
 
-You can debug the example to step through the code. 
+You can debug the example to step through the code.
 
 <details><summary><b>In Eclipse IDE</b></summary>
 
 Use the **\<Application Name> Debug (KitProg3_MiniProg4)** configuration in the **Quick Panel**. Ensure that the board is connected to your PC using the USB cable through the KitProg3 USB Type-C port (J1) and for PMG1-CY7110, PMG1-CY7111, PMG1-CY7112, and PMG1-CY7113 prototyping kits the jumper shunt on power selection jumper (J5) is placed at position 1-2.
 
-See the **Debug mode** section in the kit user guide for debugging the application on the CY7110 prototyping kit. See the **Debugging using ModusToolbox&trade;** section in [AN238945](https://infineon.com/AN238945) for EVAL_PMG1_B1_DRP kit. For more details, see the **Program and debug** section in the [Eclipse IDE for ModusToolbox&trade; user guide](https://www.infineon.com/MTBEclipseIDEUserGuide).
+See the **Debug mode** section in the kit user guide for debugging the application on the CY7110 prototyping kit. See the **Debugging using ModusToolbox&trade;** section in [AN238945](https://infineon.com/AN238945) for the EVAL_PMG1_B1_DRP kit. For more details, see the **Program and debug** section in the [Eclipse IDE for ModusToolbox&trade; user guide](https://www.infineon.com/MTBEclipseIDEUserGuide).
 
 </details>
 
@@ -241,8 +250,9 @@ See the **Debug mode** section in the kit user guide for debugging the applicati
 <details><summary><b>In other IDEs</b></summary>
 
 Follow the instructions in your preferred IDE.
-
 </details>
+
+<br>
 
 See the "Debug mode" section in the kit user guide for debugging the application on the CY7110 prototyping kit. For more details, see the "Program and debug" section in the [Eclipse IDE for ModusToolbox&trade; software user guide](https://www.infineon.com/MTBEclipseIDEUserGuide).
 
@@ -255,9 +265,9 @@ The BJT VBE voltage, which is highly temperature dependent, is the input to the 
 
 The output code of the ADC is then converted to the corresponding temperature value using an appropriate conversion formula and suitable calibration parameters (slope and offset values). The value of the `TEMP_SLOPE` and `TEMP-OFFSET` macros in the source file can be adjusted to fine-tune the output of this application on different PMG1 kits.
 
-The accuracy and resolution of the resultant temperature sensor is limited to approximately 5&deg;C on PMG1-S0, PMG1-S1, PMG1-S3, and EVAL_PMG1_B1_DRP and approximately 8&deg;C on PMG1-S2 (due to a higher Vref value being used). The working range of the internal temperature sensor is from -40&deg;C to +85&deg;C.
+The accuracy and resolution of the resultant temperature sensor is limited to approximately 5&deg;C on PMG1-S0, PMG1-S1, PMG1-S3, and EVAL_PMG1_B1_DRP and 8&deg;C on PMG1-S2 (due to a higher Vref value being used). The working range of the internal temperature sensor is from -40&deg;C to +85&deg;C.
 
-The USB-C Power Delivery 0 block is enabled under the **Peripherals** tab in the Device Configurator. Note that under the **Inputs** section, **Clock SAR** is assigned with *8 bit Divider 2 clk* with a divider value of 48, resulting in a 1-MHz clock frequency applied to the 8-bit SAR ADC as shown in Figure 2. The USBPD Stack is also initialized with suitable parameters to allow the use of the 8-bit SAR ADC of the USBPD block.
+The USB-C Power Delivery 0 block is enabled under the **Peripherals** tab in the Device Configurator. Note that under the **Inputs** section, **Clock SAR** is assigned with **8 bit Divider 2 clk** with a divider value of 48, resulting in a 1 MHz clock frequency applied to the 8-bit SAR ADC as shown in **Figure 2**. The USBPD Stack is also initialized with suitable parameters to allow the use of the 8-bit SAR ADC of the USBPD block.
 
 **Figure 2. 8-bit SAR ADC enabled under USB-C Power Delivery 0 block**
 
@@ -273,13 +283,15 @@ The user LED (LED3) is configured as the output, which toggles the state to indi
 
 <img src = "images/firmware-flowchart.png" width = "300"/>
 
+
 ### Compile-time configurations
 
-The on-chip temp sensor 8-bit SAR ADC application functionality can be customized through a set of compile-time parameters that can be turned ON/OFF through the *main.c* file.
+The on-chip temperature sensor 8-bit SAR ADC application functionality can be customized through a set of compile-time parameters that can be turned ON or OFF through the *main.c* file.
 
- Macro name          | Description                           | Allowed values
- :------------------ | :------------------------------------ | :-------------
- `DEBUG_PRINT`     | Debug print macro to enable UART print to check the status of initialization of API | 1u to enable <br> 0u to disable |
+ Macro name         | Description         | Allowed values
+ :----------------- | :-----------------  | :-------------
+ `DEBUG_PRINT`     | Debug print macro to enable UART print to check the status of initialization of API | 1u to enable <br> 0u to disable
+
 
 ### Resources and settings
 
@@ -287,10 +299,10 @@ The on-chip temp sensor 8-bit SAR ADC application functionality can be customize
 
  Resource  |  Alias/object     |    Purpose
  :-------- | :-------------    | :------------
- USBPD 0     	| 8-bit SAR ADC       	| 8-bit SAR ADC under the USBPD block used to measure the BJT temperature sensor voltage
+ USBPD 0     	| 8-bit SAR ADC      | 8-bit SAR ADC under the USBPD block used to measure the BJT temperature sensor voltage
  SCB 		| CYBSP_UART		| UART SCB block used for serial communication to send temperature values through the serial port
- Switch (BSP)	| CYBSP_USER_SW 	| User switch used as a trigger to display the temperature value 	
- LED (BSP) 	| CYBSP_USER_LED 	| User LED to indicate the output 	
+ Switch (BSP)	| CYBSP_USER_SW 	| User switch used as a trigger to display the temperature value
+ LED (BSP) 	| CYBSP_USER_LED 	| User LED to indicate the output
 
 <br>
 
@@ -323,16 +335,19 @@ Infineon provides a wealth of data at [www.infineon.com](https://www.infineon.co
 
 Document title: *CE234563* – *EZ-PD&trade; PMG1 MCU: On-chip temp sensor 8-bit SAR ADC*
 
- Version | Description of change 
- ------- | --------------------- 
- 1.0.0   | New code example      
+ Version | Description of change
+ ------- | ---------------------
+ 1.0.0   | New code example
  2.0.0   | Major update to support ModusToolbox&trade; v3.0. This version is not backward compatible with previous versions of ModusToolbox&trade; 
- 2.1.0   | Update to support EVAL_PMG1_B1_DRP kit 
+ 2.1.0   | Updated to support EVAL_PMG1_B1_DRP kit 
+ 2.2.0   | Updated to support EVAL_PMG1_S1_DRP and EVAL_PMG1_S3_DUALDRP kits
 <br>
+
 
 All referenced product or service names and trademarks are the property of their respective owners.
 
 The Bluetooth&reg; word mark and logos are registered trademarks owned by Bluetooth SIG, Inc., and any use of such marks by Infineon is under license.
+
 
 ---------------------------------------------------------
 
